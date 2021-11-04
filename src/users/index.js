@@ -1,5 +1,6 @@
 import express from "express"
 import createHttpError from "http-errors"
+import passport from "passport"
 
 import UserModel from "./schema.js"
 import { JWTAuthMiddleware } from "../auth/token.js"
@@ -57,9 +58,16 @@ usersRouter.delete("/me", JWTAuthMiddleware, async (req, res, next) => {
   }
 })
 
-usersRouter.get("/googleLogin") // This endpoint receives Google login requests from our FE and redirects them to Google
+usersRouter.get("/googleLogin", passport.authenticate("google", { scope: ["profile", "email"] })) // This endpoint receives Google login requests from our FE and redirects them to Google
 
-usersRouter.get("/googleRedirect") // This endpoint receives the response from Google
+usersRouter.get("/googleRedirect", passport.authenticate("google"), async (req, res, next) => {
+  try {
+    console.log(req.user) // we are going to receive the tokens here thanks to the passportNext function and the serializeUser function
+    res.send(req.user.tokens)
+  } catch (error) {
+    next(error)
+  }
+}) // This endpoint receives the response from Google
 
 usersRouter.get("/:id", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
