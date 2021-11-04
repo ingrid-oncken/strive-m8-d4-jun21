@@ -63,7 +63,7 @@ usersRouter.get("/googleLogin", passport.authenticate("google", { scope: ["profi
 usersRouter.get("/googleRedirect", passport.authenticate("google"), async (req, res, next) => {
   try {
     console.log(req.user) // we are going to receive the tokens here thanks to the passportNext function and the serializeUser function
-    res.send(req.user.tokens)
+    res.redirect(`http://localhost:3000?accessToken=${req.user.tokens.accessToken}&refreshToken=${req.user.tokens.refreshToken}`)
   } catch (error) {
     next(error)
   }
