@@ -57,6 +57,10 @@ usersRouter.delete("/me", JWTAuthMiddleware, async (req, res, next) => {
   }
 })
 
+usersRouter.get("/googleLogin") // This endpoint receives Google login requests from our FE and redirects them to Google
+
+usersRouter.get("/googleRedirect") // This endpoint receives the response from Google
+
 usersRouter.get("/:id", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
     const users = await UserModel.findById(req.params.id)
