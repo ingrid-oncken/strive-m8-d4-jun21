@@ -63,7 +63,18 @@ usersRouter.get("/googleLogin", passport.authenticate("google", { scope: ["profi
 usersRouter.get("/googleRedirect", passport.authenticate("google"), async (req, res, next) => {
   try {
     console.log(req.user) // we are going to receive the tokens here thanks to the passportNext function and the serializeUser function
-    res.redirect(`http://localhost:3000?accessToken=${req.user.tokens.accessToken}&refreshToken=${req.user.tokens.refreshToken}`)
+
+    res.cookie("accessToken", req.user.tokens.accessToken, {
+      httpOnly: true,
+      secure: (process.env.NODE_ENV = "production" ? true : false),
+      sameSite: "none",
+    })
+    res.cookie("refreshToken", req.user.tokens.refreshToken, {
+      httpOnly: true,
+      secure: (process.env.NODE_ENV = "production" ? true : false),
+      sameSite: "none", // strict would be the best option. We can set sameSite: "strict" only if we pay for a custom domain and we pay heroku to use not free hosting (free hosting does not allow custom domains)
+    })
+    res.redirect(`http://localhost:3000`)
   } catch (error) {
     next(error)
   }
@@ -91,7 +102,17 @@ usersRouter.post("/login", async (req, res, next) => {
       const { accessToken, refreshToken } = await JWTAuthenticate(user)
 
       // 4. Send token back as a response
-      res.send({ accessToken, refreshToken })
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: (process.env.NODE_ENV = "production" ? true : false),
+        sameSite: "none",
+      })
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: (process.env.NODE_ENV = "production" ? true : false),
+        sameSite: "none", // strict would be the best option. We can set sameSite: "strict" only if we pay for a custom domain and we pay heroku to use not free hosting (free hosting does not allow custom domains)
+      })
+      res.send()
     } else {
       next(createHttpError(401, "Credentials are not ok!"))
     }

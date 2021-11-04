@@ -3,6 +3,7 @@ import mongoose from "mongoose"
 import cors from "cors"
 import listEndpoints from "express-list-endpoints"
 import passport from "passport"
+import cookieParser from "cookie-parser"
 import usersRouter from "./users/index.js"
 import GoogleStrategy from "./auth/oauth.js"
 
@@ -14,8 +15,9 @@ const port = process.env.PORT || 3001
 // ******************** MIDDLEWARES *************************+
 passport.use("google", GoogleStrategy)
 
-server.use(cors())
+server.use(cors({ origin: "http://localhost:3000", credentials: true }))
 server.use(express.json())
+server.use(cookieParser())
 server.use(passport.initialize())
 
 // ******************** ROUTES ******************************
